@@ -70,19 +70,19 @@ var app = app || {};
         core.extensions[id] = fn(libs);
     };
 
-    var Sandbox = function (element) {
+    var Sandbox = function (moduleId) {
         var sandbox = {};
 
         sandbox.subscribe = function (context, channel, fn) {
-            core.event.subscribe(element.id, context, channel, fn);
+            core.event.subscribe(moduleId, context, channel, fn);
         };
 
         sandbox.publish = function (channel, msg) {
-            core.event.publish(element.id, channel, msg);
+            core.event.publish(moduleId, channel, msg);
         };
 
         sandbox.unsubscribe = function (context, channel) {
-            core.event.unsubscribe(element.id, context, channel);
+            core.event.unsubscribe(moduleId, context, channel);
         };
 
         sandbox.extensions = (function () { return core.extensions; }());
