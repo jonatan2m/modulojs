@@ -95,24 +95,24 @@ var app = app || {};
         }
     };
 
-    core.registerModule = function (id, constructor) {
+    /*core.registerModule = function (id, constructor) {
         var moduleElement = Object.create(HTMLElement.prototype);
         moduleElement.createdCallback = function () {
             var element = this;
             constructor(new Sandbox(element));
             //if (!element.destroy)
-            //    throw "'destroy' do modulo '" + id + "'é obrigatório";
+            //    throw "'destroy' do modulo '" + id + "'ï¿½ obrigatï¿½rio";
         };
         moduleElement.attachedCallback = function () { };
         moduleElement.detachedCallback = function () { };
         moduleElement.attributeChangedCallback = function () { };
         document.registerElement('module-' + id, { prototype: moduleElement });
-    };
+    };*/
 
 
 
     
-    app.register = core.registerModule;
+    app.register = core.register;
     app.loadLibs = loadLibs;
     app.registerExtension = registerExtension;
 }());
