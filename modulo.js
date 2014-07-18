@@ -51,17 +51,8 @@ var app = app || {};
         };
     }());
         
-    function loadLibs() {
-        var args = [].slice.call(arguments, 0);                
-        args.forEach(function (lib, index, array) {
-            if (window[lib]) {
-                libs[lib] = window[lib];
-                delete window[lib];
-            }
-            else {
-                console.error('The lib "' + lib + '" not found');
-            }
-        });
+    function registerLib(id, obj) {
+        libs[id] = obj;
     }    
     
     function registerExtension(id, fn) {
@@ -104,6 +95,6 @@ var app = app || {};
     };
     
     app.registerModule = core.registerModule;
-    app.loadLibs = loadLibs;
+    app.registerLib = registerLib;
     app.registerExtension = registerExtension;
 }());
