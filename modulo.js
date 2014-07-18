@@ -50,7 +50,6 @@ var app = app || {};
             unsubscribe: unsubscribe
         };
     }());
-    var modules = {};
         
     function loadLibs() {
         var args = [].slice.call(arguments, 0);                
@@ -89,13 +88,8 @@ var app = app || {};
 
         return sandbox;
     };
-    core.register = function (moduleId, constructor) {
-        if (!modules[moduleId]) {
-            modules[moduleId] = new constructor(new Sandbox(moduleId, core));
-        }
-    };
 
-    /*core.registerModule = function (id, constructor) {
+    core.registerModule = function (id, constructor) {
         var moduleElement = Object.create(HTMLElement.prototype);
         moduleElement.createdCallback = function () {
             var element = this;
@@ -107,12 +101,9 @@ var app = app || {};
         moduleElement.detachedCallback = function () { };
         moduleElement.attributeChangedCallback = function () { };
         document.registerElement('module-' + id, { prototype: moduleElement });
-    };*/
-
-
-
+    };
     
-    app.register = core.register;
+    app.registerModule = core.registerModule;
     app.loadLibs = loadLibs;
     app.registerExtension = registerExtension;
 }());
