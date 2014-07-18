@@ -6,6 +6,51 @@ var app = app || {};
     var libs = {};
     core.extensions = {};
     
+    core.http = (function (){
+        var xmlhttp;
+
+        if (window.XMLHttpRequest) {
+            // code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        } else {
+            // code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        var request = function(method, url, fn){
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == 4 ) {
+                    if(xmlhttp.status == 200){                        
+                        fn(xmlhttp.responseText);
+                    }
+                    else if(xmlhttp.status == 400) {
+                        alert('There was an error 400');
+                    }
+                }
+                /*else {
+               alert('something else other than 200 was returned')
+                }*/
+            }
+
+            xmlhttp.open(method, url, true);
+            xmlhttp.send();
+        };
+
+        function get(url, fn){
+            request("GET", url, fn);
+        }
+
+        function post(url, fn){
+            request("POST", url, fn);
+        }
+
+        return {
+            get: get,
+            post : post
+        };
+
+    }());
+
     core.event = (function () {
         var channels = {};
 
@@ -51,17 +96,19 @@ var app = app || {};
         };
     }());
         
-    function registerLib(id, obj) {
+    function registerLib(id, obj) { 
         libs[id] = obj;
-    }    
+    }
     
     function registerExtension(id, fn) {
         if (core.extensions[id]) console.error('there is an extension with name: "' + id + '"');
         core.extensions[id] = fn(libs);
     };
 
-    var Sandbox = function (moduleId) {
+    var Sandbox = function (moduleId, element) {
         var sandbox = {};
+
+        sandbox.element = element;
 
         sandbox.subscribe = function (context, channel, fn) {
             core.event.subscribe(moduleId, context, channel, fn);
@@ -80,11 +127,18 @@ var app = app || {};
         return sandbox;
     };
 
-    core.registerModule = function (id, constructor) {
+    core.registerModule = function (id, htmlFile, constructor) {
         var moduleElement = Object.create(HTMLElement.prototype);
         moduleElement.createdCallback = function () {
-            var element = this;
-            constructor(new Sandbox(element));
+                       
+            (function (element){    
+                function fn(html){
+                    element.innerHTML = html ;
+                    constructor(new Sandbox(id, element));
+                }
+
+                core.http.get(htmlFile, fn);
+            }(this));
             //if (!element.destroy)
             //    throw "'destroy' do modulo '" + id + "'� obrigat�rio";
         };

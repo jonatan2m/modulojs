@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--
+    Libs
+    -->
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>    
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />    
+    <script src="http://knockoutjs.com/downloads/knockout-3.1.0.debug.js"></script>
+    
+    <!--
+    ModuloJS
+    -->
+    <script src="./modulo.js"></script> 
+</head>
+<body>    
+    <!--
+    Register Libs and Extensions    
+    -->
+    <script>
+        app.registerLib('ko', ko);
+        app.registerLib('toastr', toastr);
+        app.registerLib('$', $ || JQuery);
+
+        app.registerExtension('log', function (libs) {
+
+            var log = {};            
+            log.info = function (msg) {
+                console.info(msg);
+                libs.toastr.info(msg);
+            };
+
+            log.error = function (msg) {
+                console.error(msg);
+                libs.toastr.info(msg);
+            };
+
+            return log;
+        });
+    </script>
+
+    <!--
+    Load modules    
+    -->
+    <script src="./imports/mod.js"></script>
+
+
+
+    <hr>
+    Start Modules
+    <hr>
+
+    <!--
+    Declare Module Tags
+    -->
+    <module-mod id="a"></module-mod>
+    
+    <hr>
+    End Modules
+    <hr>
+
+</body>
+</html>
