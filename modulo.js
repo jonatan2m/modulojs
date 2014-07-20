@@ -1,6 +1,23 @@
 var app = app || {};
 
 (function () {    
+    /* Hacks
+    IE7 and IE8 
+    */
+    if(!Array.prototype.some){
+        Array.prototype.some = (function(){
+            return function(fn){
+                var result = false;
+                for (var i = 0; i < this.length; i++) {
+                    if(fn(this[i], i, this)){
+                        result = true;
+                        break;
+                    }
+                }
+                return result;
+            };
+        }());
+    }
 
     var core = {};
     var libs = {};
@@ -17,7 +34,7 @@ var app = app || {};
             xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
 
-        var request = function(method, url, fn){
+        var request = function(method, url, fn, data){
             xmlhttp.onreadystatechange = function() {
                 if (xmlhttp.readyState == 4 ) {
                     if(xmlhttp.status == 200){                        
@@ -33,26 +50,26 @@ var app = app || {};
             }
 
             xmlhttp.open(method, url, true);
-            xmlhttp.send();
+            xmlhttp.send(data);
         };
 
-        function get(url, fn){
+        function get(url, fn, data){
             request("GET", url, fn);
         }
 
-        function post(url, fn){
-            request("POST", url, fn);
+        function post(url, fn, data){
+            request("POST", url, fn, data);
         }
 
         return {
             get: get,
-            post : post
+            post:post
         };
 
     }());
 
     core.event = (function () {
-        var channels = {};
+        var channels = {};        
 
         var subscribe = function (moduleId, context, channel, fn) {
             if (!channels[channel]) {
@@ -87,6 +104,7 @@ var app = app || {};
                 }
                 return false;
             });
+            
         }
 
         return {
@@ -128,24 +146,16 @@ var app = app || {};
     };
 
     core.registerModule = function (id, htmlFile, constructor) {
-        var moduleElement = Object.create(HTMLElement.prototype);
-        moduleElement.createdCallback = function () {
-                       
-            (function (element){    
-                function fn(html){
-                    element.innerHTML = html ;
-                    constructor(new Sandbox(id, element));
-                }
+        var moduleElement = document.getElementById(id);
 
-                core.http.get(htmlFile, fn);
-            }(this));
-            //if (!element.destroy)
-            //    throw "'destroy' do modulo '" + id + "'� obrigat�rio";
-        };
-        moduleElement.attachedCallback = function () { };
-        moduleElement.detachedCallback = function () { };
-        moduleElement.attributeChangedCallback = function () { };
-        document.registerElement('module-' + id, { prototype: moduleElement });
+        function fn(html){
+            moduleElement.innerHTML = html ;
+            constructor(new Sandbox(id, moduleElement));                
+        }
+        if(htmlFile)                    
+            core.http.get(htmlFile, fn);        
+        else
+            fn('');
     };
     
     app.registerModule = core.registerModule;
