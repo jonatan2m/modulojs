@@ -1,15 +1,15 @@
 var app = app || {};
 
-(function () {    
+(function () {
     /* Hacks
     IE7 and IE8 
     */
-    if(!Array.prototype.some){
-        Array.prototype.some = (function(){
-            return function(fn){
+    if (!Array.prototype.some) {
+        Array.prototype.some = (function () {
+            return function (fn) {
                 var result = false;
                 for (var i = 0; i < this.length; i++) {
-                    if(fn(this[i], i, this)){
+                    if (fn(this[i], i, this)) {
                         result = true;
                         break;
                     }
@@ -22,25 +22,29 @@ var app = app || {};
     var core = {};
     var libs = {};
     core.extensions = {};
-    
-    core.http = (function (){
-        var xmlhttp;
 
-        if (window.XMLHttpRequest) {
-            // code for IE7+, Firefox, Chrome, Opera, Safari
-            xmlhttp = new XMLHttpRequest();
-        } else {
-            // code for IE6, IE5
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    core.http = (function () {
+
+        function getXMLHttpRequest() {
+
+            if (window.XMLHttpRequest) {
+                // code for IE7+, Firefox, Chrome, Opera, Safari
+                return new XMLHttpRequest();
+            } else {
+                // code for IE6, IE5
+                return new ActiveXObject("Microsoft.XMLHTTP");
+            }
         }
 
-        var request = function(method, url, fn, data){
-            xmlhttp.onreadystatechange = function() {
-                if (xmlhttp.readyState == 4 ) {
-                    if(xmlhttp.status == 200){                        
+        var request = function (options, fn) {
+            var xmlhttp = getXMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4) {
+                    if (xmlhttp.status == 200) {
                         fn(xmlhttp.responseText);
                     }
-                    else if(xmlhttp.status == 400) {
+                    else if (xmlhttp.status == 400) {
                         alert('There was an error 400');
                     }
                 }
@@ -48,28 +52,58 @@ var app = app || {};
                alert('something else other than 200 was returned')
                 }*/
             }
-
-            xmlhttp.open(method, url, true);
-            xmlhttp.send(data);
+            
+            if (typeof options.data !== 'undefined' && options.data !== null && typeof options.data !== 'object') {
+                options.url = options.url + '?' + options.data;
+            }
+            xmlhttp.open(options.method, options.url);            
+            xmlhttp.send(options.data || null);
         };
 
-        function get(url, fn, data){
-            request("GET", url, fn);
+        function get(options, fn) {
+            if (!options.url)
+                throw options.url;
+            options.method = "GET";            
+            if (typeof options.data === 'object')
+            {
+                var query = [];
+                for (var key in options.data) {
+                    query.push(encodeURIComponent(key) + '=' + encodeURIComponent(options.data[key]));
+                }
+                options.data = query.join("&");
+            }
+            
+            request(options, fn);
         }
 
-        function post(url, fn, data){
-            request("POST", url, fn, data);
+        function post(options, fn) {
+            if (!options.url)
+                throw options.url;
+            options.method = "POST";
+
+            request(options, fn);
+        }
+        
+        /*Obsolete*/
+        function getHTML(url, fn) {
+            /*
+            https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/HTML_in_XMLHttpRequest#Browser_compatibility
+            */
+            var xmlhttp = getXMLHttpRequest();
+            xmlhttp.open("GET", url, true);
+            xmlhttp.onload = function () { fn(this.responseText); };
+            xmlhttp.send(null);
         }
 
         return {
             get: get,
-            post:post
+            post: post            
         };
 
     }());
 
     core.event = (function () {
-        var channels = {};        
+        var channels = {};
 
         var subscribe = function (moduleId, context, channel, fn) {
             if (!channels[channel]) {
@@ -89,9 +123,11 @@ var app = app || {};
         };
 
         var publish = function (context, channel, msg) {
-            var sub = channels[channel][context];
-            for (var i = 0; i < sub.length; i++)
-                sub[i].callback(msg);
+            if (typeof channels[channel] !== 'undefined' && typeof channels[channel][context] !== 'undefined') {
+                var sub = channels[channel][context];
+                for (var i = 0; i < sub.length; i++)
+                    sub[i].callback(msg);
+            }
         };
 
         var unsubscribe = function (moduleId, context, channel) {
@@ -104,7 +140,6 @@ var app = app || {};
                 }
                 return false;
             });
-            
         }
 
         return {
@@ -113,11 +148,11 @@ var app = app || {};
             unsubscribe: unsubscribe
         };
     }());
-        
-    function registerLib(id, obj) { 
+
+    function registerLib(id, obj) {
         libs[id] = obj;
     }
-    
+
     function registerExtension(id, fn) {
         if (core.extensions[id]) console.error('there is an extension with name: "' + id + '"');
         core.extensions[id] = fn(libs);
@@ -142,22 +177,35 @@ var app = app || {};
 
         sandbox.extensions = (function () { return core.extensions; }());
 
+        sandbox.http = (function () {
+            return {
+                get: function (options, fn) {
+                    core.http.get(options, fn);
+                },
+                post: function (options, fn) {
+                    core.http.post(options, fn);
+                }
+            };
+        }());
+
         return sandbox;
     };
 
     core.registerModule = function (id, htmlFile, constructor) {
         var moduleElement = document.getElementById(id);
 
-        function fn(html){
-            moduleElement.innerHTML = html ;
-            constructor(new Sandbox(id, moduleElement));                
+        function fn(html) {
+            moduleElement.innerHTML = html;
+            constructor(new Sandbox(id, moduleElement));
         }
-        if(htmlFile)                    
-            core.http.get(htmlFile, fn);        
-        else
+        if (typeof htmlFile !== 'function')
+            core.http.get({ url: htmlFile }, fn);
+        else {
+            constructor = constructor || htmlFile;
             fn('');
+        }
     };
-    
+
     app.registerModule = core.registerModule;
     app.registerLib = registerLib;
     app.registerExtension = registerExtension;
