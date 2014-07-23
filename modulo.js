@@ -35,14 +35,27 @@ var app = app || {};
                 return new ActiveXObject("Microsoft.XMLHTTP");
             }
         }
+        //aplicar filtro
+        function converter(response) {
 
+            function _json(data) {
+                return JSON.parse(data);
+            }
+
+            try {
+                return _json(response);
+            } catch (e) {
+                return response;
+            }
+        }
         var request = function (options, fn) {
             var xmlhttp = getXMLHttpRequest();
 
             xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4) {
                     if (xmlhttp.status == 200) {
-                        fn(xmlhttp.responseText);
+                        var response = typeof xmlhttp.responseText === "string" ? xmlhttp.responseText : undefined;
+                        fn(converter(response));
                     }
                     else if (xmlhttp.status == 400) {
                         alert('There was an error 400');
