@@ -10,6 +10,19 @@ app.registerExtension('http', function (libs) {
                 return new ActiveXObject("Microsoft.XMLHTTP");
             }
         }
+
+        function getParams(data) {
+            if (typeof data === 'object') {
+                var query = [];
+                for (var key in data) {
+                    query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+                }
+                return query.join("&");
+            }
+            return data;
+        }
+
+
         //aplicar filtro
         function converter(response) {
 
@@ -41,10 +54,9 @@ app.registerExtension('http', function (libs) {
                 }*/
             }
             
-            if (typeof options.data !== 'undefined' && options.data !== null && typeof options.data !== 'object') {
-                options.url = options.url + '?' + options.data;
-            }
-            xmlhttp.open(options.method, options.url);            
+            xmlhttp.open(options.method, options.url);
+            if (options.method == 'POST')
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
             xmlhttp.send(options.data || null);
         };
 
@@ -55,16 +67,11 @@ app.registerExtension('http', function (libs) {
             else
                 options.url = url;
 
-            options.method = "GET";            
-            if (typeof options.data === 'object')
-            {
-                var query = [];
-                for (var key in options.data) {
-                    query.push(encodeURIComponent(key) + '=' + encodeURIComponent(options.data[key]));
-                }
-                options.data = query.join("&");
+            options.data = getParams(options.data);
+            if (typeof options.data !== 'undefined' && options.data !== null && typeof options.data !== 'object') {
+                options.url = options.url + '?' + options.data;
             }
-            
+            options.method = "GET";            
             request(options, fn);
         }
 
@@ -74,8 +81,9 @@ app.registerExtension('http', function (libs) {
                 options = url;
             else
                 options.url = url;
-            options.method = "POST";
 
+            options.data = getParams(options.data);
+            options.method = "POST";
             request(options, fn);
         }
         
