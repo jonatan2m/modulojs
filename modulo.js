@@ -59,7 +59,8 @@ var app = app || {};
         var moduleElement = document.getElementById(id);
 
         function fn(html) {
-            moduleElement.innerHTML = html;
+              if(moduleElement)
+                moduleElement.innerHTML = html;
             constructor(new Sandbox(id, moduleElement));
         }
         if (typeof htmlFile !== 'function')
