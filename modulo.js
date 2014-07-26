@@ -38,16 +38,16 @@ var app = app || {};
 
         sandbox.element = element;
 
-        sandbox.subscribe = function (context, channel, fn) {
-            core.extensions["pubsub"].subscribe(moduleId, context, channel, fn);
+        sandbox.subscribe = function (channel, fn) {
+            core.extensions["pubsub"].subscribe(moduleId, channel, fn);
         };
 
         sandbox.publish = function (channel, msg) {
-            core.extensions["pubsub"].publish(moduleId, channel, msg);
+            core.extensions["pubsub"].publish(channel, msg);
         };
 
-        sandbox.unsubscribe = function (context, channel) {
-            core.extensions["pubsub"].unsubscribe(moduleId, context, channel);
+        sandbox.unsubscribe = function (channel) {
+            core.extensions["pubsub"].unsubscribe(moduleId, channel);
         };
 
         sandbox.extensions = (function () { return core.extensions; }());
