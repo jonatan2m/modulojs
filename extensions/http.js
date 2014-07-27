@@ -1,5 +1,7 @@
 app.registerExtension('http', function (libs) {
 
+    var processData = false;
+
         function getXMLHttpRequest() {
 
             if (window.XMLHttpRequest) {
@@ -11,15 +13,22 @@ app.registerExtension('http', function (libs) {
             }
         }
 
-        function getParams(data) {
+        function getParams(data) {            
             if (typeof data === 'object') {
                 var query = [];
                 for (var key in data) {
-                    query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
-                }
-                return query.join("&");
-            }
-            return data;
+                    if (Object.prototype.toString.call(data[key]) == '[object Array]') {
+                        var items = data[key];
+                        processData = true;
+                        for (var index in items) {
+                            query.push(encodeURIComponent(key+ "[]") + '=' + encodeURIComponent(items[index]));
+                        }                        
+                    }else
+                        query.push(encodeURIComponent(key) + '=' + encodeURIComponent(data[key]));
+                }                
+                data = query.join("&");
+            } 
+            return data;            
         }
 
 
@@ -41,7 +50,7 @@ app.registerExtension('http', function (libs) {
 
             xmlhttp.onreadystatechange = function () {
                 if (xmlhttp.readyState == 4) {
-                    if (xmlhttp.status == 200) {
+                    if ((xmlhttp.status == 200) || xmlhttp.status == 204) {
                         var response = typeof xmlhttp.responseText === "string" ? xmlhttp.responseText : undefined;
                         fn(converter(response));
                     }
@@ -55,9 +64,11 @@ app.registerExtension('http', function (libs) {
             }
             
             xmlhttp.open(options.method, options.url);
-            if (options.method == 'POST')
-                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-            xmlhttp.send(options.data || null);
+            if (options.method == 'POST' || processData) {                
+                xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+                xmlhttp.setRequestHeader("Accept", "*/*");
+            }
+            xmlhttp.send(processData && options.data || null);
         };
 
         function get(url, fn) {
@@ -68,7 +79,7 @@ app.registerExtension('http', function (libs) {
                 options.url = url;
 
             options.data = getParams(options.data);
-            if (typeof options.data !== 'undefined' && options.data !== null && typeof options.data !== 'object') {
+            if (options.data !== null) {
                 options.url = options.url + '?' + options.data;
             }
             options.method = "GET";            
@@ -76,6 +87,7 @@ app.registerExtension('http', function (libs) {
         }
 
         function post(url, fn) {
+            processData = true;
             var options = {};
             if (typeof url === 'object')
                 options = url;
