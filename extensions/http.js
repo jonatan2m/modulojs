@@ -64,7 +64,7 @@ app.registerExtension('http', function (libs) {
             }
             
             xmlhttp.open(options.method, options.url);
-            if (options.method == 'POST' || processData) {                
+            if (options.method == 'POST' || options.method == 'PUT' || processData) {                
                 xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
                 xmlhttp.setRequestHeader("Accept", "*/*");
             }
@@ -72,6 +72,7 @@ app.registerExtension('http', function (libs) {
         };
 
         function get(url, fn) {
+            processData = false;
             var options = {};
             if (typeof url === 'object')
                 options = url;
@@ -98,6 +99,19 @@ app.registerExtension('http', function (libs) {
             options.method = "POST";
             request(options, fn);
         }
+
+        function put(url, fn) {
+            processData = true;
+            var options = {};
+            if (typeof url === 'object')
+                options = url;
+            else
+                options.url = url;
+
+            options.data = getParams(options.data);
+            options.method = "PUT";
+            request(options, fn);
+        }
         
         /*Obsolete*/
         function getHTML(url, fn) {
@@ -112,6 +126,7 @@ app.registerExtension('http', function (libs) {
 
         return {
             get: get,
-            post: post            
+            post: post,
+            put: put
         };
 });
