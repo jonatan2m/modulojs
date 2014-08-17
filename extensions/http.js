@@ -80,7 +80,7 @@ app.registerExtension('http', function (libs) {
                 options.url = url;
 
             options.data = getParams(options.data);
-            if (options.data !== null) {
+            if (options.data !== undefined) {
                 options.url = options.url + '?' + options.data;
             }
             options.method = "GET";            
