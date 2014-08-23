@@ -52,7 +52,8 @@ app.registerExtension('http', function (libs) {
                 if (xmlhttp.readyState == 4) {
                     if ((xmlhttp.status == 200) || xmlhttp.status == 204) {
                         var response = typeof xmlhttp.responseText === "string" ? xmlhttp.responseText : undefined;
-                        fn(converter(response));
+                        if(fn)
+                            fn(converter(response));
                     }
                     else if (xmlhttp.status == 400) {
                         alert('There was an error 400');
