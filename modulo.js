@@ -39,15 +39,15 @@ var app = app || {};
         sandbox.element = element;
 
         sandbox.subscribe = function (channel, fn) {
-            core.extensions["pubsub"].subscribe(moduleId, channel, fn);
+            return core.extensions["pubsub"].subscribe(channel, fn);
         };
 
         sandbox.publish = function (channel, msg) {
             core.extensions["pubsub"].publish(channel, msg);
         };
 
-        sandbox.unsubscribe = function (channel) {
-            core.extensions["pubsub"].unsubscribe(moduleId, channel);
+        sandbox.unsubscribe = function (token) {
+            return core.extensions["pubsub"].unsubscribe(token);
         };
 
         sandbox.extensions = (function () { return core.extensions; }());
