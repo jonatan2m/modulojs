@@ -9,7 +9,7 @@ app.registerExtension('pubsub', function (libs) {
         if (!channels[channel]) {
             channels[channel] = {};            
         }
-        var token = "id_" + ++count;
+        var token = "id_" + (++count);
 
         channels[channel][token] = fn;
 
@@ -37,7 +37,7 @@ app.registerExtension('pubsub', function (libs) {
             }
         }
         return result;
-    }
+    };
     return {
         subscribe: subscribe,
         publish: publish,
