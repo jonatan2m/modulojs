@@ -36,6 +36,13 @@ module.exports = function(grunt) {
         }
       }
     },
+    notify_hooks: {
+      options: {
+        enabled: true,
+        max_js_hint_notifications: 5,
+        title: 'Cookiejar'
+      }
+    },
     watch: {
       files: ['<%= jshint.files %>'],
       tasks: ['jshint', 'qunit']

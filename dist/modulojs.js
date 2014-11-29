@@ -38,16 +38,16 @@ var app = app || {};
 
         sandbox.element = element;
 
-        sandbox.subscribe = function (context, channel, fn) {
-            core.extensions.pubsub.subscribe(moduleId, context, channel, fn);
+        sandbox.subscribe = function (channel, fn) {
+            return core.extensions.pubsub.subscribe(channel, fn);
         };
 
         sandbox.publish = function (channel, msg) {
-            core.extensions.pubsub.publish(moduleId, channel, msg);
+            core.extensions.pubsub.publish(channel, msg);
         };
 
-        sandbox.unsubscribe = function (context, channel) {
-            core.extensions.pubsub.unsubscribe(moduleId, context, channel);
+        sandbox.unsubscribe = function (token) {
+            return core.extensions.pubsub.unsubscribe(token);
         };
 
         sandbox.extensions = (function () { return core.extensions; }());
@@ -180,7 +180,6 @@ var app = app || {};
             post: post            
         };
 });;app.registerExtension('pubsub', function (libs) {
-
     var channels = {};
     var subscribe = function (moduleId, context, channel, fn) {
         if (!channels[channel]) {
@@ -189,28 +188,22 @@ var app = app || {};
             channels[channel][context].push({ module: moduleId, callback: fn });
         }
         else {
-            var sub = channels[channel][context];
-            if(sub){
-            var hasItem = sub.some(function (element, index, array) {
+            var hasItem = channels[channel][context].some(function (element, index, array) {
                 return element.module == moduleId;
             });
             if (!hasItem)
                 channels[channel][context].push({ module: moduleId, callback: fn });
         }
-        }
     };
     var publish = function (context, channel, msg) {
         if (typeof channels[channel] !== 'undefined' && typeof channels[channel][context] !== 'undefined') {
             var sub = channels[channel][context];
-            if(sub){
             for (var i = 0; i < sub.length; i++)
                 sub[i].callback(msg);
-        }
         }
     };
     var unsubscribe = function (moduleId, context, channel) {
         var sub = channels[channel][context];
-        if(sub){
         sub.some(function (element, index, array) {
             if (element.module == moduleId) {
                 array.splice(index, 1);
@@ -218,7 +211,6 @@ var app = app || {};
             }
             return false;
         });
-    }
     };
     return {
         subscribe: subscribe,

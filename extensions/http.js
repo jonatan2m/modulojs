@@ -52,7 +52,7 @@ app.registerExtension('http', function (libs) {
                 /*else {
                alert('something else other than 200 was returned')
                 }*/
-            }
+            };
             
             xmlhttp.open(options.method, options.url);
             if (options.method == 'POST')

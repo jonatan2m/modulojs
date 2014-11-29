@@ -1,17 +1,12 @@
 app.registerModule("mod", "./imports/mod.html", function (sb) {
     var mod = {};
     var count = 1;
-<<<<<<< HEAD
-<<<<<<< HEAD
     
-    sb.subscribe("moduloA", "evL", function (msg) { sb.extensions.log.info(msg); sb.unsubscribe("moduloA", "evL"); });
+    sb.subscribe("evL", function (msg) { sb.extensions.log.info(msg); sb.unsubscribe("evL"); });
    
    document.getElementById("btnMod").onclick = function () {        
-        sb.subscribe("moduloA", "evL", function (msg) { sb.extensions.log.info("Novo");}); 
+        sb.subscribe("evL", function (msg) { sb.extensions.log.info("Novo");}); 
     };         
-=======
-=======
->>>>>>> FETCH_HEAD
     mod.tokenEvl = sb.subscribe("evL", function (msg) { sb.extensions.log.info(msg); });
             
     document.getElementById("load").onclick = function () {        
@@ -23,5 +18,4 @@ app.registerModule("mod", "./imports/mod.html", function (sb) {
         count++;
         sb.subscribe("evL", function (msg) { sb.extensions.log.info(msg);  });        
     };
->>>>>>> FETCH_HEAD
 });

@@ -31,7 +31,7 @@ var app = app || {};
     function registerExtension(id, fn) {
         if (core.extensions[id]) console.error('there is an extension with name: "' + id + '"');
         core.extensions[id] = fn(libs);
-    };
+    }
 
     var Sandbox = function (moduleId, element) {
         var sandbox = {};
@@ -39,15 +39,15 @@ var app = app || {};
         sandbox.element = element;
 
         sandbox.subscribe = function (channel, fn) {
-            return core.extensions["pubsub"].subscribe(channel, fn);
+            return core.extensions.pubsub.subscribe(channel, fn);
         };
 
         sandbox.publish = function (channel, msg) {
-            core.extensions["pubsub"].publish(channel, msg);
+            core.extensions.pubsub.publish(channel, msg);
         };
 
         sandbox.unsubscribe = function (token) {
-            return core.extensions["pubsub"].unsubscribe(token);
+            return core.extensions.pubsub.unsubscribe(token);
         };
 
         sandbox.extensions = (function () { return core.extensions; }());
@@ -64,7 +64,7 @@ var app = app || {};
             constructor(new Sandbox(id, moduleElement));
         }
         if (typeof htmlFile !== 'function')
-            core.extensions["http"].get(htmlFile, fn);
+            core.extensions.http.get(htmlFile, fn);
         else {
             constructor = constructor || htmlFile;
             fn('');
