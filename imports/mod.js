@@ -1,14 +1,24 @@
-app.registerModule("mod", "./imports/mod.html", function (sb) {    
+app.registerModule("mod", "./imports/mod.html", function (sb) {
+    var mod = {};
     var count = 1;
-    sb.subscribe("mod", "evL", function (msg) { sb.extensions.log.info(msg); });
+<<<<<<< HEAD
+    
+    sb.subscribe("moduloA", "evL", function (msg) { sb.extensions.log.info(msg); sb.unsubscribe("moduloA", "evL"); });
+   
+   document.getElementById("btnMod").onclick = function () {        
+        sb.subscribe("moduloA", "evL", function (msg) { sb.extensions.log.info("Novo");}); 
+    };         
+=======
+    mod.tokenEvl = sb.subscribe("evL", function (msg) { sb.extensions.log.info(msg); });
             
     document.getElementById("load").onclick = function () {        
         sb.publish('evL', 'publish: ' + count);
-        sb.unsubscribe("mod", "evL");
+        sb.unsubscribe(mod.tokenEvl);
         count = 0;
     };
     document.getElementById("new").onclick = function () {
         count++;
-        sb.subscribe("mod", "evL", function (msg) { sb.extensions.log.info(msg);  });        
+        sb.subscribe("evL", function (msg) { sb.extensions.log.info(msg);  });        
     };
+>>>>>>> FETCH_HEAD
 });
