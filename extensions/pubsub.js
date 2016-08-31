@@ -10,13 +10,13 @@ app.registerExtension('pubsub', function (libs) {
         }
 
         if (!channels[channel]) {
-            if (pubsub.debug)
+            if (debug)
                 console.debug("The channel " + channel + " is creating...");
             channels[channel] = {};            
         }
         var token = "id_" + (++count);
 
-        if (pubsub.debug)
+        if (debug)
             console.debug("The channel " + channel + " has a new subscriber. Action to be executed: " + fn.name);
         channels[channel][token] = fn;
 
@@ -26,12 +26,12 @@ app.registerExtension('pubsub', function (libs) {
         if (typeof channels[channel] !== 'undefined') {
             var sub = channels[channel];
             for (var token in sub){
-                if (pubsub.debug)
+                if (debug)
                     console.debug("The channel " + channel + " is sending message...", msg);         
                 sub[token](msg);
             }
         }else{
-            if (pubsub.debug)
+            if (debug)
                 console.error("The channel " + channel + " is undefined. The message don't send:" , msg);
         }
     };
